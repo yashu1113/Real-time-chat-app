@@ -11,20 +11,32 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    email: {
+      type: String,
+      required: false,
+      unique: false,
+    },
     password: {
       type: String,
-      required: true,
       minlength: 6,
+    },
+    googleId: {
+      type: String,
+    },
+    provider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
     gender: {
       type: String,
-      required: true,
+      required: false,
       enum: ["male", "female", "other"],
     },
     profilePic: {
       type: String,
       default: "",
-    }, // created at and updatedat => member since <created at>
+    },
   },
   { timestamps: true }
 );
