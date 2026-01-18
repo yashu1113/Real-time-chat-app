@@ -2,14 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Ensure the entire page cannot scroll */
-html, body, #root {
-  height: 100%;
-  overflow: hidden;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Ensure proper height inheritance */
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  background-color: #111827;
+  color: white;
+}
+
+/* Prevent white flash and ensure dark background immediately */
+body {
+  background-color: #111827;
+  overflow: auto;
+}
+
 #root {
   display: flex;
   flex-direction: column;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
