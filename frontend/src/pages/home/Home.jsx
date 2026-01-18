@@ -1,5 +1,5 @@
-import MessageContainer from "../../components/messages/MessageContainer";
-import Sidebar from "../../components/sidebar/Sidebar";
+import { MessageContainer } from "../../features/messages";
+import { Sidebar } from "../../features/conversations";
 import { useState, useEffect } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
 
@@ -28,16 +28,16 @@ const Home = () => {
 		<div className='h-screen w-full flex bg-gray-900'>
 			{/* Mobile overlay */}
 			{isMobile && showSidebar && (
-				<div 
+				<div
 					className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
 					onClick={() => setShowSidebar(false)}
 				/>
 			)}
-			
+
 			{/* Sidebar - responsive drawer on mobile */}
 			<div className={`
-				${isMobile ? 
-					`fixed inset-y-0 left-0 z-50 w-80 transform transition-transform duration-300 ease-in-out ${showSidebar ? 'translate-x-0' : '-translate-x-full'}` 
+				${isMobile ?
+					`fixed inset-y-0 left-0 z-50 w-80 transform transition-transform duration-300 ease-in-out ${showSidebar ? 'translate-x-0' : '-translate-x-full'}`
 					: 'w-full md:w-1/3 lg:w-96'
 				}
 				h-full bg-gray-800 border-r border-gray-700
@@ -47,7 +47,7 @@ const Home = () => {
 					{isMobile && (
 						<div className="flex items-center justify-between p-4 border-b border-gray-700">
 							<h2 className="text-white font-semibold">Chats</h2>
-							<button 
+							<button
 								onClick={() => setShowSidebar(false)}
 								className="text-white p-2 hover:bg-gray-700 rounded"
 							>
@@ -58,13 +58,13 @@ const Home = () => {
 					<Sidebar />
 				</div>
 			</div>
-			
+
 			{/* Main content area */}
 			<div className='flex-1 h-full flex flex-col'>
 				{/* Mobile header with menu button */}
 				{isMobile && (
 					<div className="bg-gray-800 border-b border-gray-700 p-4 flex items-center">
-						<button 
+						<button
 							onClick={() => setShowSidebar(true)}
 							className="text-white p-2 hover:bg-gray-700 rounded mr-3"
 						>

@@ -3,7 +3,7 @@ console.log("GOOGLE_CLIENT_ID at passport load:", process.env.GOOGLE_CLIENT_ID);
 const passport = require("passport");
 const googleStrategy = require("passport-google-oauth20").Strategy;
 let User;
-import("../backend/models/user.model.js")
+import("../backend/features/users/user.model.js")
   .then((module) => {
     User = module.default;
   })
