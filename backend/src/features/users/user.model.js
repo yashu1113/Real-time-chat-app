@@ -1,45 +1,86 @@
 import mongoose from "mongoose";
+import { generateCustomId } from "../../shared/utils/generate-custom-id.js";
 
-const userSchema = new mongoose.Schema(
-  {
-    fullName: {
+const userSchema = new mongoose.Schema({
+    userId: {
+      type: String,
+      unique: true,
+      index: true,
+      immutable: true,
+    },
+    
+    name: {
       type: String,
       required: true,
+      trim: true,
     },
-    username: {
+
+    email: {
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
     },
-    email: {
-      type: String,
-      required: false,
-      unique: false,
-    },
+
     password: {
       type: String,
       minlength: 6,
+      select: false,
     },
-    googleId: {
-      type: String,
-    },
-    provider: {
+
+    authProvider: {
       type: String,
       enum: ["local", "google"],
       default: "local",
     },
-    gender: {
+
+    googleId: {
       type: String,
-      required: false,
-      enum: ["male", "female", "other"],
     },
-    profilePic: {
+
+    avatar: {
       type: String,
       default: "",
+    },
+
+    about: {
+      type: String,
+      default: "",
+    },
+
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    isOnline: {
+      type: Boolean,
+      default: false,
+    },
+
+    lastSeen: {
+      type: Date,
+      default: null,
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
 );
 
-export const User = mongoose.model("User", userSchema);
-export default User;
+userSchema.index({ googleId: 1 });
+
+userSchema.pre("save", async function (next) {
+  if (!this.customId) {
+    this.customId = await generateCustomId("US");
+  }
+  next();
+});
+
+const User = mongoose.model("User", userSchema);  
+
+export default User;  
