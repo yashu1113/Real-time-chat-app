@@ -669,7 +669,8 @@
 
     /* Fixed Header for Mobile */
     .chat-header {
-        position: absolute;
+        position: fixed;
+        /* Changed from absolute to fixed */
         top: 0;
         left: 0;
         width: 100%;
@@ -678,6 +679,8 @@
         border-left: none;
         z-index: 1000;
         border-radius: 0;
+        background: var(--chat-bg-header);
+        /* Ensure background is opaque */
     }
 
     .messages-container {
