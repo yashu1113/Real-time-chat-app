@@ -1,6 +1,7 @@
 import Message from "./message.model.js";
 import Chat from "../chat/chat.model.js";
 import asyncHandler from "../../shared/utils/async-handler.js";
+import { broadcastToRoom } from "../../socket/socket-utils.js";
 
 export const sendMessage = asyncHandler(async (req, res) => {
   const senderId = req.user._id;
@@ -41,8 +42,40 @@ export const sendMessage = asyncHandler(async (req, res) => {
 
   await message.populate("sender", "name email avatar");
 
+  // Update chat with last message and increment unread counts
+  chat.lastMessage = message._id;
   chat.updatedAt = Date.now();
+
+  // Increment unread count for other participants
+  chat.participants.forEach((participantId) => {
+    if (participantId.toString() !== senderId.toString()) {
+      const unreadEntry = chat.unreadCounts.find(
+        (entry) => entry.user.toString() === participantId.toString()
+      );
+      if (unreadEntry) {
+        unreadEntry.count += 1;
+      } else {
+        chat.unreadCounts.push({ user: participantId, count: 1 });
+      }
+    }
+  });
+
   await chat.save();
+
+  const io = req.app.get("socketio");
+  if (io) {
+    // 1. Broadcast to the chat room (for active chat window updates)
+    broadcastToRoom(io, chatId, "newMessage", { message });
+
+    // 2. Broadcast to participants' personal rooms (for sidebar updates)
+    chat.participants.forEach((participantId) => {
+      io.to(participantId.toString()).emit("newMessage", {
+        message,
+        isGlobal: true, // Hint for frontend to update sidebar
+        unreadCounts: chat.unreadCounts, // Pass updated counts
+      });
+    });
+  }
 
   res.status(201).json({
     success: true,
@@ -82,12 +115,13 @@ export const getMessages = asyncHandler(async (req, res) => {
     });
   }
 
-  const limit = Number(req.query.limit) || 50;
-  const skip = Number(req.query.skip) || 0;
+  const limit = Number(req.query.limit) || 20;
+  const page = Number(req.query.page) || 1;
+  const skip = (page - 1) * limit;
 
   const messages = await Message.find({ chat: chatId })
     .populate("sender", "name email avatar")
-    .sort({ createdAt: 1 })
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
 
@@ -95,8 +129,10 @@ export const getMessages = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    count: messages.length,
-    total: totalMessages,
-    messages,
+    page,
+    limit,
+    totalMessages,
+    totalPages: Math.ceil(totalMessages / limit),
+    messages: messages.reverse(), // Send in chronological order (Old -> New)
   });
 });

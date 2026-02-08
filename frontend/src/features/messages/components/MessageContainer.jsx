@@ -1,78 +1,98 @@
-import React from "react";
-import { TiMessages } from "react-icons/ti";
-import { useAuthContext } from "../../../shared/context/AuthContext";
-import { useSocketContext } from "../../../shared/context/SocketContext";
-import useConversation from "../../conversations/store/useConversation";
-import useSocketMessages from "../hooks/useSocketMessages";
-import Messages from "./Messages";
-import MessageInput from "./MessageInput";
+import React, { useState, useRef, useEffect } from "react";
+import { IoChatbubblesOutline } from 'react-icons/io5';
+import { useGetMessages, useSendMessage } from '..';
+import * as conversationsApi from '../../conversations/api/conversationsApi';
+import useSocketMessages from '../hooks/useSocketMessages';
+import useConversation from '../../conversations/store/useConversation';
+import { useAuthContext } from '../../../shared/context/AuthContext';
+import { useSocketContext } from '../../../shared/context/SocketContext';
+import ChatHeader from './ChatHeader';
+import MessageList from './MessageList';
+import MessageInput from './MessageInput';
+import '../../../styles/chat-theme.css';
 
-// NoChatSelected component - shown when no conversation is selected
-const NoChatSelected = () => {
-    const { authUser } = useAuthContext();
-
-    return (
-        <div className="flex items-center justify-center w-full h-full bg-gray-900">
-            <div className="w-full max-w-4xl px-4 text-center flex flex-col items-center gap-4 sm:gap-6 md:gap-8">
-                {/* Welcome message */}
-                <p className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-200">
-                    Welcome 👋 {authUser?.fullName || "Guest"} ❄
-                </p>
-                {/* Prompt to select a chat */}
-                <p className="text-base sm:text-lg md:text-xl text-gray-400">
-                    Select a chat to start messaging
-                </p>
-                {/* Icon */}
-                <TiMessages className="text-4xl sm:text-5xl md:text-7xl text-blue-500" aria-label="Message Icon" />
-            </div>
-        </div>
-    );
-};
-
-// Main MessageContainer component with proper fixed scrolling layout
 const MessageContainer = () => {
-    const { selectedConversation } = useConversation();
+    const [messageText, setMessageText] = useState('');
+    const { selectedConversation, setMessages, messages, markChatAsRead } = useConversation();
+    const { loading, hasMore, loadMore } = useGetMessages();
+    const { sendMessage, loading: sending } = useSendMessage();
+    const { authUser } = useAuthContext();
     const { onlineUsers } = useSocketContext();
 
     // Listen for real-time messages
     useSocketMessages();
 
-    // Check if selected user is online
-    const isOnline = selectedConversation && onlineUsers.includes(selectedConversation._id);
+    useEffect(() => {
+        if (selectedConversation?._id) {
+            const markRead = async () => {
+                try {
+                    await conversationsApi.markAsRead(selectedConversation._id);
+                    markChatAsRead(selectedConversation._id, authUser._id);
+                } catch (error) {
+                    console.error("Failed to mark chat as read:", error);
+                }
+            };
+            markRead();
+        }
+    }, [selectedConversation?._id, markChatAsRead, authUser._id]);
+
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+        if (!messageText.trim() || sending) return;
+
+        await sendMessage(messageText);
+        setMessageText('');
+    };
+
+    if (!selectedConversation) {
+        return (
+            <div className="flex flex-col h-screen items-center justify-center" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
+                <div className="welcome-container">
+                    <IoChatbubblesOutline className="welcome-icon mb-6" />
+                    <h2 className="welcome-title">
+                        Welcome 👋 {authUser?.name || 'Guest'}
+                    </h2>
+                    <p className="welcome-subtitle">
+                        Select a chat to start messaging
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    const otherParticipant = selectedConversation.participants?.find(p => p._id !== authUser._id) || selectedConversation;
+    const isOnline = onlineUsers?.includes(otherParticipant._id);
 
     return (
-        <div className="w-full h-full flex flex-col overflow-hidden">
-            {selectedConversation ? (
-                <>
-                    {/* Fixed Header - Receiver Name with Online Status */}
-                    <div className="flex-shrink-0 bg-gray-800 px-4 py-3 md:px-6 md:py-4 border-b border-gray-700 shadow-sm">
-                        <div className="flex items-center gap-2">
-                            <span className="text-white text-lg md:text-xl font-semibold">
-                                {selectedConversation.fullName}
-                            </span>
-                            {isOnline && (
-                                <span className="flex items-center gap-1 text-sm text-green-400">
-                                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                                    Online
-                                </span>
-                            )}
-                        </div>
-                    </div>
+        <div className="flex flex-col h-full">
+            <ChatHeader otherParticipant={otherParticipant} isOnline={isOnline} />
 
-                    {/* Scrollable Messages Container - takes remaining space */}
-                    <div className="flex-1 overflow-y-auto">
-                        <Messages />
-                    </div>
+            {/* Messages Area with Background Pattern */}
+            <div className="flex-1 relative overflow-hidden" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
+                <div
+                    className="absolute inset-0 opacity-[0.06]"
+                    style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='pattern' x='0' y='0' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cg fill='%23667781'%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Cpath d='M20,5 L25,10 L20,15 Z'/%3E%3Crect x='5' y='25' width='8' height='8' rx='1'/%3E%3Ccircle cx='30' cy='30' r='3'/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width='400' height='400' fill='url(%23pattern)'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'repeat',
+                        backgroundSize: '400px',
+                    }}
+                ></div>
 
-                    {/* Fixed Input Box */}
-                    <div className="flex-shrink-0 border-t border-gray-200 bg-white">
-                        <MessageInput />
-                    </div>
-                </>
-            ) : (
-                // Show no chat selected when no conversation is selected
-                <NoChatSelected />
-            )}
+                <MessageList
+                    messages={messages}
+                    loading={loading}
+                    authUser={authUser}
+                    hasMore={hasMore}
+                    loadMore={loadMore}
+                />
+            </div>
+
+            <MessageInput
+                messageText={messageText}
+                setMessageText={setMessageText}
+                onSubmit={handleSendMessage}
+                sending={sending}
+            />
         </div>
     );
 };

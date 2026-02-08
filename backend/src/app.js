@@ -15,10 +15,10 @@ const app = express();
   
 // CORS Configuration - MUST be before other middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: ['http://localhost:3000'],
   credentials: true, // Allow cookies to be sent
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'cookie '],
+  allowedHeaders: ['Content-Type', 'Authorization', 'cookie'],
 }));
 
 if (process.env.NODE_ENV !== 'production') {

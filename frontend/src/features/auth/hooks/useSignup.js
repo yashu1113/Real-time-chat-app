@@ -1,30 +1,34 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../../shared/context/AuthContext";
+import { setStoredUser, setStoredToken } from "../../../shared/utils/storage";
 import * as authApi from "../api/authApi";
 
 const useSignup = () => {
   const [loading, setLoading] = useState(false);
   const { setAuthUser } = useAuthContext();
 
-  const signup = async ({ fullName, username, password, confirmPassword, gender }) => {
-    const success = handleInputErrors({ fullName, username, password, confirmPassword, gender });
+  const signup = async ({ name, email, password, confirmPassword }) => {
+    const success = handleInputErrors({ name, email, password, confirmPassword });
     if (!success) return;
 
     setLoading(true);
     try {
       const data = await authApi.registerUser({
-        fullName,
-        username,
+        name,
+        email,
         password,
-        confirmPassword,
-        gender,
       });
 
-      localStorage.setItem("chat-user", JSON.stringify(data));
-      setAuthUser(data);
+      // Backend returns: { success: true, message: "...", user: {...} }
+      // Note: Signup doesn't return token, user needs to login
+      if (data.success) {
+        toast.success(data.message || "Signup successful! Please login.");
+      }
+      
+      return data;
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Signup failed");
     } finally {
       setLoading(false);
     }
@@ -35,9 +39,16 @@ const useSignup = () => {
 
 export default useSignup;
 
-function handleInputErrors({ fullName, username, password, confirmPassword, gender }) {
-  if (!fullName || !username || !password || !confirmPassword || !gender) {
+function handleInputErrors({ name, email, password, confirmPassword }) {
+  if (!name || !email || !password || !confirmPassword) {
     toast.error("Please fill in all fields");
+    return false;
+  }
+
+  // Email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    toast.error("Please enter a valid email address");
     return false;
   }
 

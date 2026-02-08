@@ -51,16 +51,59 @@ export const createOrGetChat = asyncHandler(async (req, res) => {
 
 export const getMyChats = asyncHandler(async (req, res) => {
   const userId = req.user._id;
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
 
   const chats = await Chat.find({
     participants: userId,
   })
     .populate("participants", "name email avatar isOnline lastSeen")
-    .sort({ updatedAt: -1 });
+    .populate({
+      path: "lastMessage",
+      select: "content createdAt sender",
+    })
+    .sort({ updatedAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const totalChats = await Chat.countDocuments({ participants: userId });
 
   res.status(200).json({
     success: true,
-    count: chats.length,
+    page,
+    limit,
+    totalChats,
+    totalPages: Math.ceil(totalChats / limit),
     chats,
+  });
+});
+
+export const markAsRead = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { chatId } = req.params;
+
+  const chat = await Chat.findOne({ _id: chatId, participants: userId });
+
+  if (!chat) {
+    return res.status(404).json({
+      success: false,
+      message: "Chat not found",
+    });
+  }
+
+  // Find the unread count entry for this user and reset it
+  const unreadEntry = chat.unreadCounts.find(
+    (entry) => entry.user.toString() === userId.toString()
+  );
+
+  if (unreadEntry) {
+    unreadEntry.count = 0;
+    await chat.save();
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Chat marked as read",
   });
 });

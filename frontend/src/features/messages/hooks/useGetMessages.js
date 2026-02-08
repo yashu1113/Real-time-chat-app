@@ -4,43 +4,47 @@ import * as messagesApi from "../api/messagesApi";
 
 const useGetMessages = () => {
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const { messages, setMessages, selectedConversation } = useConversation();
 
+  // Reset pagination when conversation changes
   useEffect(() => {
-    const getMessages = async () => {
+    setPage(1);
+    setHasMore(true);
+  }, [selectedConversation?._id]);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (loading || (!hasMore && page !== 1)) return;
+      
       setLoading(true);
       try {
-        const data = await messagesApi.getMessages(selectedConversation._id);
-
-        console.log(
-          `📥 Loaded ${data.length} messages for conversation:`,
-          selectedConversation._id
-        );
-        data.forEach((msg, index) => {
-          console.log(`   Message ${index + 1}:`);
-          console.log("      Sender ID:", msg.senderId);
-          console.log("      Receiver ID:", msg.receiverId);
-          console.log("      Message:", msg.message);
-          console.log("      Message ID:", msg._id);
-          console.log(
-            "      Timestamp:",
-            new Date(msg.createdAt).toLocaleString()
-          );
-        });
-
-        setMessages(data);
+        const data = await messagesApi.getMessages(selectedConversation._id, { page, limit: 20 });
+        
+        if (data.messages) {
+          // If first page, replace. If older pages, prepend.
+          setMessages(prev => page === 1 ? data.messages : [...data.messages, ...prev]);
+          setHasMore(data.page < data.totalPages);
+        }
       } catch (error) {
         console.error("Error fetching messages:", error);
-        setMessages([]);
+        if (page === 1) setMessages([]);
       } finally {
         setLoading(false);
       }
     };
 
-    if (selectedConversation?._id) getMessages();
-  }, [selectedConversation?._id, setMessages]);
+    if (selectedConversation?._id) fetchMessages();
+  }, [selectedConversation?._id, page]);
 
-  return { messages, loading };
+  const loadMore = () => {
+    if (!loading && hasMore) {
+      setPage(prev => prev + 1);
+    }
+  };
+
+  return { messages, loading, hasMore, loadMore };
 };
 
 export default useGetMessages;
