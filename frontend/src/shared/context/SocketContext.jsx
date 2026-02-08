@@ -19,7 +19,9 @@ export const SocketContextProvider = ({ children }) => {
     useEffect(() => {
         if (authUser) {
             const token = getStoredToken();
-            const socketInstance = io("http://127.0.0.1:5000", {
+            // In production, this should be your Render backend URL if VITE_API_URL is not set
+            const socketUrl = import.meta.env.VITE_API_URL || "https://real-time-chat-app-tkfe.onrender.com";
+            const socketInstance = io(socketUrl, {
                 auth: {
                     token,
                 },

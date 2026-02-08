@@ -2,13 +2,11 @@ import { Server } from "socket.io";
 import socketAuth from "./socket-auth.js";
 import registerSocketEvents from "./socket-events.js";
 
+import corsOptions from "../shared/config/cors.js";
+
 const initializeSocket = (httpServer, app) => {
   const io = new Server(httpServer, {
-    cors: {
-      origin: process.env.FRONTEND_URL || "http://localhost:3000",
-      credentials: true,
-      methods: ["GET", "POST"],
-    },
+    cors: corsOptions,
   });
 
   io.use(socketAuth);

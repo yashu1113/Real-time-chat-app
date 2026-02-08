@@ -13,13 +13,10 @@ import messageRoutes from "./features/messages/message-routes.js";
 const app = express();
 
   
+import corsOptions from "./shared/config/cors.js";
+
 // CORS Configuration - MUST be before other middleware
-app.use(cors({
-  origin: ['http://localhost:3000'],
-  credentials: true, // Allow cookies to be sent
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'cookie'],
-}));
+app.use(cors(corsOptions));
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
