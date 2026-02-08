@@ -135,7 +135,7 @@ export function LoginForm({ onForgotPassword }) {
                     {/* Google Sign-In Button */}
                     <div className="mt-6 text-center">
                         <a
-                            href="/api/auth/google"
+                            href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/google`}
                             className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                         >
                             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
