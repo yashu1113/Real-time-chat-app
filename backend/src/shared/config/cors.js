@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const allowedOrigins = [
-  "http://localhost:5173", // Local Development
+  "http://localhost:5173", // Local Development (Vite default)
+  "http://localhost:3000", // Local Development (User's current port)
   "https://cheatchatbyyash.vercel.app", // Production Frontend
   process.env.FRONTEND_URL, // Dynamic Override
 ];
