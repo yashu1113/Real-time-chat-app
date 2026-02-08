@@ -1,24 +1,30 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../../shared/context/AuthContext";
+import { setStoredUser, setStoredToken } from "../../../shared/utils/storage";
 import * as authApi from "../api/authApi";
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
   const { setAuthUser } = useAuthContext();
 
-  const login = async (username, password) => {
-    const success = handleInputErrors(username, password);
+  const login = async (email, password) => {
+    const success = handleInputErrors(email, password);
     if (!success) return;
     
     setLoading(true);
     try {
-      const data = await authApi.loginUser(username, password);
+      const data = await authApi.loginUser(email, password);
 
-      localStorage.setItem("chat-user", JSON.stringify(data));
-      setAuthUser(data);
+      // Backend returns: { success: true, token: "...", user: { _id, name, email } }
+      if (data.success && data.token && data.user) {
+        setStoredToken(data.token);
+        setStoredUser(data.user);
+        setAuthUser(data.user);
+        toast.success("Login successful!");
+      }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -29,9 +35,16 @@ const useLogin = () => {
 
 export default useLogin;
 
-function handleInputErrors(username, password) {
-  if (!username || !password) {
+function handleInputErrors(email, password) {
+  if (!email || !password) {
     toast.error("Please fill in all fields");
+    return false;
+  }
+
+  // Email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    toast.error("Please enter a valid email address");
     return false;
   }
 

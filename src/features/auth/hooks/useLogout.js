@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuthContext } from "../../../shared/context/AuthContext";
+import { removeStoredUser, removeStoredToken } from "../../../shared/utils/storage";
 import toast from "react-hot-toast";
 import * as authApi from "../api/authApi";
 
@@ -10,12 +11,18 @@ const useLogout = () => {
   const logout = async () => {
     setLoading(true);
     try {
-      await authApi.logoutUser();
+      const data = await authApi.logoutUser();
       
-      localStorage.removeItem("chat-user");
+      // Backend returns: { success: true, message: "Logged out successfully" }
+      removeStoredToken();
+      removeStoredUser();
       setAuthUser(null);
+      
+      if (data.success) {
+        toast.success(data.message || "Logged out successfully");
+      }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Logout failed");
     } finally {
       setLoading(false);
     }

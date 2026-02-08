@@ -5,21 +5,23 @@ import * as messagesApi from "../api/messagesApi";
 
 const useSendMessage = () => {
   const [loading, setLoading] = useState(false);
-  const { messages, setMessages, selectedConversation } = useConversation();
+  const { messages, setMessages, selectedConversation, upsertConversation } = useConversation();
 
-  const sendMessage = async (message) => {
+  const sendMessage = async (content) => {
+    if (!content.trim()) return;
     setLoading(true);
     try {
-      const data = await messagesApi.sendMessage(selectedConversation._id, message);
-
-      console.log("📤 Message Sent:");
-      console.log("   Sender ID:", data.senderId);
-      console.log("   Receiver ID:", data.receiverId);
-      console.log("   Message:", data.message);
-      console.log("   Message ID:", data._id);
-      console.log("   Timestamp:", new Date(data.createdAt).toLocaleString());
-
-      setMessages([...messages, data]);
+      const response = await messagesApi.sendMessage(selectedConversation._id, content);
+      
+      // Update message list
+      setMessages([...messages, response.data]);
+      
+      // Update sidebar list immediately
+      upsertConversation({
+          ...selectedConversation,
+          lastMessage: response.data,
+          updatedAt: response.data.createdAt
+      });
     } catch (error) {
       toast.error(error.message);
     } finally {

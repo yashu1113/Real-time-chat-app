@@ -3,45 +3,29 @@
  * Centralizes all message-related API calls
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+import { apiFetch } from '../../../shared/utils/api';
 
 /**
- * Get messages for a conversation
- * @param {string} userId - User ID to get conversation with
- * @returns {Promise<Array>} Array of messages
+ * Get messages for a specific chat
+ * @param {string} chatId - ID of the chat
+ * @returns {Promise<Object>} Object containing messages array
  */
-export const getMessages = async (userId) => {
-  const res = await fetch(`${API_BASE_URL}/api/messages/${userId}`, {
-    credentials: "include",
-  });
-  const data = await res.json();
-  
-  if (data.error) {
-    throw new Error(data.error);
-  }
-
-  return data;
+export const getMessages = async (chatId, { page = 1, limit = 20 } = {}) => {
+  const query = new URLSearchParams({ page, limit }).toString();
+  return apiFetch(`/api/messages/${chatId}?${query}`);
 };
 
 /**
- * Send a message to a user
- * @param {string} userId - Receiver user ID
- * @param {string} message - Message content
+ * Send a message to a chat
+ * @param {string} chatId - Target chat ID
+ * @param {string} content - Message content
  * @returns {Promise<Object>} Created message
  */
-export const sendMessage = async (userId, message) => {
-  const res = await fetch(`${API_BASE_URL}/api/messages/send/${userId}`, {
+export const sendMessage = async (chatId, content) => {
+  return apiFetch('/api/messages', {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ chatId, content }),
   });
-
-  const data = await res.json();
-  
-  if (data.error) {
-    throw new Error(data.error);
-  }
-
-  return data;
 };
+

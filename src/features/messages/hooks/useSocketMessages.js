@@ -8,30 +8,39 @@ import useConversation from "../../conversations/store/useConversation";
  */
 const useSocketMessages = () => {
   const { socket } = useSocketContext();
-  const { messages, setMessages, selectedConversation } = useConversation();
+  const { setMessages, selectedConversation } = useConversation();
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !selectedConversation?._id) return;
+
+    const chatId = selectedConversation._id;
+
+    // Join the chat room
+    socket.emit("joinChat", { chatId });
 
     // Listen for new messages
-    socket.on("newMessage", (newMessage) => {
-      console.log("📨 Received real-time message:", newMessage);
-
-      // Only update if the message is for the current conversation
-      if (
-        selectedConversation &&
-        (newMessage.senderId === selectedConversation._id ||
-          newMessage.receiverId === selectedConversation._id)
-      ) {
-        setMessages([...messages, newMessage]);
+    const handleNewMessage = (data) => {
+      const newMessage = data.message || data;
+      
+      // Only update if the message belongs to this chat
+      if (newMessage.chat === chatId) {
+        setMessages((prevMessages) => {
+          // Deduplication: Don't add if message already exists
+          const isDuplicate = prevMessages.some(m => m._id === newMessage._id);
+          if (isDuplicate) return prevMessages;
+          
+          return [...prevMessages, newMessage];
+        });
       }
-    });
-
-    // Cleanup listener on unmount
-    return () => {
-      socket.off("newMessage");
     };
-  }, [socket, messages, setMessages, selectedConversation]);
+
+    socket.on("newMessage", handleNewMessage);
+
+    // Cleanup listener and leave room if necessary
+    return () => {
+      socket.off("newMessage", handleNewMessage);
+    };
+  }, [socket, selectedConversation?._id, setMessages]);
 };
 
 export default useSocketMessages;
