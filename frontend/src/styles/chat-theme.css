@@ -506,48 +506,76 @@
     position: relative;
 }
 
-/* Global Scrollbar Styling - Modern & Subtle */
+/* Global Scrollbar Styling - Modern & Visible */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 10px;
     transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 217, 163, 0.3);
+    background: rgba(0, 217, 163, 0.5);
 }
 
 /* Firefox Support */
 * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.15) rgba(255, 255, 255, 0.03);
 }
 
 /* Messages Container Specific Scrollbar */
 .messages-container::-webkit-scrollbar {
-    width: 5px;
+    width: 8px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
 }
 
-.messages-container::-webkit-scrollbar-thumb:hover,
+.messages-container::-webkit-scrollbar-thumb:hover {
+    background: var(--chat-accent-primary);
+}
+
+/* Sidebar Scrollbar - Users & Conversations List */
+.sidebar .overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar .overflow-y-auto::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    margin: 4px 0;
+}
+
+.sidebar .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+}
+
 .sidebar .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: var(--chat-accent-primary);
 }
 
-.sidebar .overflow-y-auto::-webkit-scrollbar {
-    width: 4px;
+/* Custom scrollbar class for better visibility */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.15) rgba(255, 255, 255, 0.03);
 }
 
 /* Check Mark */
@@ -727,6 +755,51 @@
 
     .welcome-container {
         display: none;
+    }
+
+    /* Mobile Scrollbar Optimization */
+    /* Thinner scrollbars for mobile devices */
+    ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 217, 163, 0.4);
+    }
+
+    /* Messages container scrollbar on mobile */
+    .messages-container::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Sidebar scrollbar on mobile */
+    .sidebar .overflow-y-auto::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    .sidebar .overflow-y-auto::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Smooth scrolling for mobile */
+    .messages-container,
+    .sidebar .overflow-y-auto {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
     }
 }
 
