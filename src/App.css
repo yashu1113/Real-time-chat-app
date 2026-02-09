@@ -1,0 +1,25 @@
+/* Ensure the app takes up the full viewport height */
+#root {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Mobile Viewport Fix: Lock body to prevent keyboard scroll */
+@media (max-width: 768px) {
+
+    html,
+    body {
+        height: 100dvh;
+        width: 100vw;
+        overflow: hidden;
+        position: fixed;
+    }
+
+    #root {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+    }
+}
