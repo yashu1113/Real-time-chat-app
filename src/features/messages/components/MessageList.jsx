@@ -44,11 +44,6 @@ const MessageList = ({ messages, loading, authUser, hasMore, loadMore }) => {
         });
     };
 
-    const handleLongPress = (message) => {
-        if (message.isDeleted || (typeof message.sender === 'object' ? message.sender._id : message.sender) !== authUser._id) return;
-
-        setConfirmModal({ isOpen: true, messageId: message._id });
-    };
 
     // Close context menu on click anywhere
     useEffect(() => {
@@ -106,22 +101,11 @@ const MessageList = ({ messages, loading, authUser, hasMore, loadMore }) => {
                         const isSent = messageSenderId === authUser._id;
                         const isDeleted = message.isDeleted;
 
-                        // Long press implementation for mobile
-                        let pressTimer;
-                        const handleTouchStart = () => {
-                            pressTimer = setTimeout(() => handleLongPress(message), 700);
-                        };
-                        const handleTouchEnd = () => {
-                            clearTimeout(pressTimer);
-                        };
-
                         return (
                             <div
                                 key={message._id}
                                 className={`flex ${isSent ? 'justify-end' : 'justify-start'}`}
                                 onContextMenu={(e) => handleContextMenu(e, message)}
-                                onTouchStart={handleTouchStart}
-                                onTouchEnd={handleTouchEnd}
                             >
                                 <div
                                     className={`message-bubble ${isSent ? 'message-bubble-sent' : 'message-bubble-received'} ${isDeleted ? 'opacity-60 italic' : ''}`}
@@ -154,9 +138,14 @@ const MessageList = ({ messages, loading, authUser, hasMore, loadMore }) => {
                             <button
                                 className="w-full text-left px-4 py-2 hover:bg-[#3c4144] flex items-center gap-2 text-red-400"
                                 onClick={() => {
-                                    setConfirmModal({ isOpen: true, messageId: contextMenu.messageId });
-                                }
-                                }
+                                    const isMobile = window.innerWidth < 768;
+                                    if (isMobile) {
+                                        deleteMessage(contextMenu.messageId);
+                                        setContextMenu({ ...contextMenu, visible: false });
+                                    } else {
+                                        setConfirmModal({ isOpen: true, messageId: contextMenu.messageId });
+                                    }
+                                }}
                             >
                                 <MdDelete /> Delete for everyone
                             </button>
