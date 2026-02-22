@@ -18,7 +18,7 @@ function App() {
 	return (
 		<div className='h-screen w-full'>
 			<Routes>
-				<Route path='/' element={authUser ? <ChatPage /> : <Navigate to={"/login"} />} />
+				<Route path='/' element={authUser ? <ChatPage /> : <Navigate to={"/signup"} />} />
 				<Route path='/login' element={authUser ? <Navigate to='/' /> : <Login />} />
 				<Route path='/signup' element={authUser ? <Navigate to='/' /> : <SignUp />} />
 				<Route path='/chat' element={authUser ? <ChatPage /> : <Navigate to={"/login"} />} />
