@@ -16,18 +16,12 @@ const ChatPage = () => {
     }
 
     return (
-        <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
-            <div className={`h-full ${selectedConversation ? 'mobile-hidden' : ''}`} style={{ width: 'auto' }}>
+        <div className="flex h-screen overflow-hidden" style={{ height: '100dvh', backgroundColor: 'var(--chat-bg-main)' }}>
+            <div className={`h-full min-h-0 ${selectedConversation ? 'mobile-hidden' : ''}`} style={{ width: 'auto' }}>
                 <Sidebar />
             </div>
 
-            <div className={`flex-1 h-full flex flex-col ${!selectedConversation ? 'mobile-hidden' : 'messages-container-wrapper'}`}>
-                {/* Mobile Header Override / Back Button area could be here or inside MessageContainer */}
-                {/* Actually, it's cleaner to put the back button inside the ChatHeader or a wrapper here. 
-                    Let's put a subtle back button overlay or rely on the ChatHeader modification.
-                    Wait, the design says "Add 'Back' button to ChatHeader.jsx".
-                    Let's follow that. For now, pass the handler down or just use the store in ChatHeader.
-                */}
+            <div className={`flex-1 h-full min-h-0 flex flex-col ${!selectedConversation ? 'mobile-hidden' : 'messages-container-wrapper'}`}>
                 <MessageContainer />
             </div>
         </div>

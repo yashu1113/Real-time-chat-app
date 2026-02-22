@@ -68,7 +68,7 @@ const MessageContainer = () => {
             <ChatHeader otherParticipant={otherParticipant} isOnline={isOnline} />
 
             {/* Messages Area with Background Pattern */}
-            <div className="flex-1 relative overflow-hidden" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
+            <div className="messages-area flex-1 relative overflow-hidden" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
                 <div
                     className="absolute inset-0 opacity-[0.06]"
                     style={{
