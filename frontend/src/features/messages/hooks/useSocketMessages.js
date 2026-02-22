@@ -8,7 +8,7 @@ import useConversation from "../../conversations/store/useConversation";
  */
 const useSocketMessages = () => {
   const { socket } = useSocketContext();
-  const { setMessages, selectedConversation } = useConversation();
+  const { setMessages, selectedConversation, deleteMessageFromStore } = useConversation();
 
   useEffect(() => {
     if (!socket || !selectedConversation?._id) return;
@@ -34,13 +34,21 @@ const useSocketMessages = () => {
       }
     };
 
+    // Listen for deleted messages
+    const handleMessageDeleted = (data) => {
+      const { messageId } = data;
+      deleteMessageFromStore(messageId);
+    };
+
     socket.on("newMessage", handleNewMessage);
+    socket.on("messageDeleted", handleMessageDeleted);
 
     // Cleanup listener and leave room if necessary
     return () => {
       socket.off("newMessage", handleNewMessage);
+      socket.off("messageDeleted", handleMessageDeleted);
     };
-  }, [socket, selectedConversation?._id, setMessages]);
+  }, [socket, selectedConversation?._id, setMessages, deleteMessageFromStore]);
 };
 
 export default useSocketMessages;

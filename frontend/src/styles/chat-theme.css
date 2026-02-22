@@ -63,7 +63,7 @@
 
 /* Message Bubbles - Enhanced */
 .message-bubble {
-    max-width: 65%;
+    max-width: 75%;
     padding: 10px 14px;
     border-radius: 12px;
     position: relative;
@@ -499,10 +499,7 @@
 .messages-container {
     flex: 1;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    overscroll-behavior-y: contain;
-    padding: 20px 60px;
+    padding: 20px 30px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -670,15 +667,12 @@
 @media (max-width: 768px) {
     .sidebar {
         width: 100%;
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         height: 100%;
-        height: 100dvh;
         z-index: 50;
         border-right: none;
-        display: flex;
-        flex-direction: column;
     }
 
     /* When a chat is selected, hide the sidebar on mobile */
@@ -686,27 +680,14 @@
         display: none;
     }
 
-    /* The scrollable list inside sidebar gets bounded height */
-    .sidebar .overflow-y-auto {
-        flex: 1;
-        min-height: 0;
-        overflow-y: scroll;
-        -webkit-overflow-scrolling: touch;
-        touch-action: pan-y;
-        overscroll-behavior-y: contain;
-    }
-
     .messages-container-wrapper {
         width: 100%;
         height: 100%;
-        height: 100dvh;
         position: fixed;
         top: 0;
         left: 0;
         z-index: 60;
         background: var(--chat-bg-main);
-        display: flex;
-        flex-direction: column;
     }
 
     /* When NO chat is selected, hide the messages on mobile */
@@ -716,7 +697,8 @@
 
     /* Fixed Header for Mobile */
     .chat-header {
-        position: sticky;
+        position: fixed;
+        /* Changed from absolute to fixed */
         top: 0;
         left: 0;
         width: 100%;
@@ -726,38 +708,21 @@
         z-index: 1000;
         border-radius: 0;
         background: var(--chat-bg-header);
-        flex-shrink: 0;
-    }
-
-    /* Messages area fills remaining space */
-    .messages-area {
-        flex: 1;
-        min-height: 0;
-        position: relative;
-        overflow: hidden;
+        /* Ensure background is opaque */
     }
 
     .messages-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 12px 10px 12px 10px;
+        padding: 70px 10px 80px 10px;
+        /* Increased bottom padding for input */
+        /* Top padding for header */
         gap: 8px;
-        overflow-y: scroll;
-        -webkit-overflow-scrolling: touch;
-        touch-action: pan-y;
-        overscroll-behavior-y: contain;
-        display: flex;
-        flex-direction: column;
     }
 
     /* Mobile Chat Input Fix */
     .message-input-container {
         padding: 8px 10px;
         gap: 6px;
-        position: sticky;
+        position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
@@ -765,7 +730,6 @@
         z-index: 1000;
         background: var(--chat-bg-header);
         border-top: 1px solid var(--chat-border);
-        flex-shrink: 0;
     }
 
     .message-input {
@@ -793,15 +757,49 @@
         display: none;
     }
 
-    /* Hide scrollbars visually on mobile but keep scroll functional */
+    /* Mobile Scrollbar Optimization */
+    /* Thinner scrollbars for mobile devices */
     ::-webkit-scrollbar {
-        width: 0;
-        height: 0;
+        width: 4px;
+        height: 4px;
     }
 
-    .messages-container::-webkit-scrollbar,
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 217, 163, 0.4);
+    }
+
+    /* Messages container scrollbar on mobile */
+    .messages-container::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Sidebar scrollbar on mobile */
     .sidebar .overflow-y-auto::-webkit-scrollbar {
-        width: 0;
+        width: 3px;
+    }
+
+    .sidebar .overflow-y-auto::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Smooth scrolling for mobile */
+    .messages-container,
+    .sidebar .overflow-y-auto {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
     }
 }
 

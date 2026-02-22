@@ -29,3 +29,14 @@ export const sendMessage = async (chatId, content) => {
   });
 };
 
+
+/**
+ * Delete a message
+ * @param {string} messageId - ID of the message to delete
+ * @returns {Promise<Object>} Status response
+ */
+export const deleteMessage = async (messageId) => {
+  return apiFetch(`/api/messages/${messageId}`, {
+    method: "DELETE",
+  });
+};

@@ -1,12 +1,61 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { IoCheckmarkDone } from 'react-icons/io5';
 import { formatMessageTime } from '../../../shared/utils/chatHelpers';
+import useDeleteMessage from '../hooks/useDeleteMessage';
+import { MdDelete } from 'react-icons/md';
+import ConfirmModal from '../../../shared/components/ConfirmModal';
 
 const MessageList = ({ messages, loading, authUser, hasMore, loadMore }) => {
     const messagesEndRef = useRef(null);
     const topLoaderRef = useRef(null);
     const containerRef = useRef(null);
     const [prevMessagesCount, setPrevMessagesCount] = useState(0);
+    const { deleteMessage } = useDeleteMessage();
+    const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, messageId: null });
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, messageId: null });
+
+    const handleContextMenu = (e, message) => {
+        if (message.isDeleted || (typeof message.sender === 'object' ? message.sender._id : message.sender) !== authUser._id) return;
+
+        e.preventDefault();
+
+        // Approximate menu dimensions
+        const menuWidth = 180;
+        const menuHeight = 45;
+
+        let x = e.clientX;
+        let y = e.clientY;
+
+        // Check if menu goes off-screen right
+        if (x + menuWidth > window.innerWidth) {
+            x = window.innerWidth - menuWidth - 10;
+        }
+
+        // Check if menu goes off-screen bottom
+        if (y + menuHeight > window.innerHeight) {
+            y = window.innerHeight - menuHeight - 10;
+        }
+
+        setContextMenu({
+            visible: true,
+            x,
+            y,
+            messageId: message._id
+        });
+    };
+
+    const handleLongPress = (message) => {
+        if (message.isDeleted || (typeof message.sender === 'object' ? message.sender._id : message.sender) !== authUser._id) return;
+
+        setConfirmModal({ isOpen: true, messageId: message._id });
+    };
+
+    // Close context menu on click anywhere
+    useEffect(() => {
+        const handleClick = () => setContextMenu({ ...contextMenu, visible: false });
+        window.addEventListener('click', handleClick);
+        return () => window.removeEventListener('click', handleClick);
+    }, [contextMenu]);
 
     // Scroll to bottom whenever messages change
     useEffect(() => {
@@ -36,7 +85,7 @@ const MessageList = ({ messages, loading, authUser, hasMore, loadMore }) => {
     }, [hasMore, loadMore, loading]);
 
     return (
-        <div ref={containerRef} className="messages-container relative z-10 flex flex-col">
+        <div ref={containerRef} className="messages-container relative z-10 flex flex-col h-full overflow-y-auto">
             {/* Sentinel for loading history */}
             {hasMore && (
                 <div ref={topLoaderRef} className="flex justify-center p-4">
@@ -55,19 +104,39 @@ const MessageList = ({ messages, loading, authUser, hasMore, loadMore }) => {
                     {messages.map((message) => {
                         const messageSenderId = typeof message.sender === 'object' ? message.sender._id : message.sender;
                         const isSent = messageSenderId === authUser._id;
+                        const isDeleted = message.isDeleted;
+
+                        // Long press implementation for mobile
+                        let pressTimer;
+                        const handleTouchStart = () => {
+                            pressTimer = setTimeout(() => handleLongPress(message), 700);
+                        };
+                        const handleTouchEnd = () => {
+                            clearTimeout(pressTimer);
+                        };
 
                         return (
                             <div
                                 key={message._id}
                                 className={`flex ${isSent ? 'justify-end' : 'justify-start'}`}
+                                onContextMenu={(e) => handleContextMenu(e, message)}
+                                onTouchStart={handleTouchStart}
+                                onTouchEnd={handleTouchEnd}
                             >
                                 <div
-                                    className={`message-bubble ${isSent ? 'message-bubble-sent' : 'message-bubble-received'}`}
+                                    className={`message-bubble ${isSent ? 'message-bubble-sent' : 'message-bubble-received'} ${isDeleted ? 'opacity-60 italic' : ''}`}
                                 >
-                                    <div className="message-text">{message.content}</div>
+                                    <div className="message-text">
+                                        {isDeleted ? (
+                                            <span className="flex items-center gap-1">
+                                                <MdDelete className="text-sm opacity-50" />
+                                                {isSent ? "You deleted this message" : `${message.sender?.name || 'User'} deleted this message`}
+                                            </span>
+                                        ) : message.content}
+                                    </div>
                                     <div className="message-timestamp">
                                         <span>{formatMessageTime(message.createdAt)}</span>
-                                        {isSent && (
+                                        {isSent && !isDeleted && (
                                             <IoCheckmarkDone className="check-mark" />
                                         )}
                                     </div>
@@ -75,6 +144,35 @@ const MessageList = ({ messages, loading, authUser, hasMore, loadMore }) => {
                             </div>
                         );
                     })}
+
+                    {/* Simple Right-Click Context Menu for Web */}
+                    {contextMenu.visible && (
+                        <div
+                            className="fixed bg-[#2a2f32] border border-[#3c4144] rounded shadow-xl z-[9999] py-1 text-white text-sm"
+                            style={{ top: contextMenu.y, left: contextMenu.x }}
+                        >
+                            <button
+                                className="w-full text-left px-4 py-2 hover:bg-[#3c4144] flex items-center gap-2 text-red-400"
+                                onClick={() => {
+                                    setConfirmModal({ isOpen: true, messageId: contextMenu.messageId });
+                                }
+                                }
+                            >
+                                <MdDelete /> Delete for everyone
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Modern Confirmation Modal */}
+                    <ConfirmModal
+                        isOpen={confirmModal.isOpen}
+                        onClose={() => setConfirmModal({ isOpen: false, messageId: null })}
+                        onConfirm={() => deleteMessage(confirmModal.messageId)}
+                        title="Delete Message?"
+                        message="This message will be deleted for everyone in this chat."
+                        confirmText="Delete"
+                        type="danger"
+                    />
                 </>
             )}
             <div ref={messagesEndRef} />
