@@ -14,11 +14,9 @@ const googleClient = new OAuth2Client(
 const signup = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
- 
   if (!name || !email || !password) {
     return errorResponse(res, 400, "All fields are required");
   }
-
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -28,10 +26,9 @@ const signup = asyncHandler(async (req, res) => {
   if (password.length < 6) {
     return errorResponse(res, 400, "Password must be at least 6 characters");
   }
- 
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
- 
   const newUser = await User.create({
     name,
     email,
@@ -51,8 +48,6 @@ const signup = asyncHandler(async (req, res) => {
 });
 
 export default signup;
-
-
 
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -110,16 +105,10 @@ export const googleLogin = asyncHandler(async (req, res) => {
 
     if (user) {
       const token = generateToken(user._id);
-
       return res.status(200).json({
         success: true,
         token,
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          authProvider: user.authProvider,
-        },
+        user: { _id: user._id, name: user.name, email: user.email, authProvider: user.authProvider },
       });
     }
 
@@ -132,16 +121,10 @@ export const googleLogin = asyncHandler(async (req, res) => {
       await user.save();
 
       const token = generateToken(user._id);
-
       return res.status(200).json({
         success: true,
         token,
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          authProvider: user.authProvider,
-        },
+        user: { _id: user._id, name: user.name, email: user.email, authProvider: user.authProvider },
       });
     }
 
@@ -159,12 +142,7 @@ export const googleLogin = asyncHandler(async (req, res) => {
     res.status(201).json({
       success: true,
       token,
-      user: {
-        _id: newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-        authProvider: newUser.authProvider,
-      },
+      user: { _id: newUser._id, name: newUser.name, email: newUser.email, authProvider: newUser.authProvider },
     });
   } catch (error) {
     console.error("Google token verification error:", error);
@@ -176,50 +154,57 @@ export const googleLogin = asyncHandler(async (req, res) => {
  * Handle initial redirect to Google
  */
 export const getGoogleAuthUrl = (req, res) => {
+  // Ensure credentials are loaded at request time
+  if (!googleClient._clientId) {
+    googleClient._clientId = process.env.GOOGLE_CLIENT_ID;
+    googleClient._clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    googleClient.redirectUri = process.env.GOOGLE_CALLBACK_URL;
+  }
+
   const url = googleClient.generateAuthUrl({
     access_type: "offline",
     scope: ["profile", "email"],
     redirect_uri: process.env.GOOGLE_CALLBACK_URL,
     client_id: process.env.GOOGLE_CLIENT_ID,
+    prompt: "select_account",
   });
   res.redirect(url);
 };
 
 /**
- * Handle Google callback and issue token (for redirect flow)
+ * Handle Google callback and issue token (redirect flow)
+ * Must NOT use asyncHandler — errors must redirect to /login, not return JSON
  */
-export const handleGoogleCallback = asyncHandler(async (req, res) => {
-  const { code } = req.query;
+export const handleGoogleCallback = async (req, res) => {
+  const { code, error } = req.query;
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
+  if (error) {
+    return res.redirect(`${frontendUrl}/login?error=cancelled`);
+  }
 
   if (!code) {
-    console.error("No code provided in Google callback");
-    return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_code`);
+    return res.redirect(`${frontendUrl}/login?error=no_code`);
   }
 
   try {
-    // Ensure the client has the credentials (in case they weren't loaded at start)
+    // Ensure credentials are loaded (ES module imports resolve before dotenv runs)
     if (!googleClient._clientId) {
       googleClient._clientId = process.env.GOOGLE_CLIENT_ID;
       googleClient._clientSecret = process.env.GOOGLE_CLIENT_SECRET;
       googleClient.redirectUri = process.env.GOOGLE_CALLBACK_URL;
     }
 
-    console.log("Exchanging code for tokens...");
-    console.log("Using Client ID (first 10 chars):", process.env.GOOGLE_CLIENT_ID?.substring(0, 10));
-
-    // Exchange code for tokens
     const { tokens } = await googleClient.getToken({
       code,
       redirect_uri: process.env.GOOGLE_CALLBACK_URL,
     });
 
     const idToken = tokens.id_token;
-
     if (!idToken) {
-      throw new Error("No id_token returned from Google");
+      return res.redirect(`${frontendUrl}/login?error=auth_failed`);
     }
 
-    // Verify the id_token
     const ticket = await googleClient.verifyIdToken({
       idToken,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -231,7 +216,6 @@ export const handleGoogleCallback = asyncHandler(async (req, res) => {
     const name = payload.name;
     const avatar = payload.picture || "";
 
-    // Find or create user
     let user = await User.findOne({ $or: [{ googleId }, { email }] });
 
     if (!user) {
@@ -244,27 +228,19 @@ export const handleGoogleCallback = asyncHandler(async (req, res) => {
         isEmailVerified: true,
       });
     } else {
-        if (!user.googleId) user.googleId = googleId;
-        user.authProvider = "google";
-        if (avatar && !user.avatar) user.avatar = avatar;
-        await user.save();
+      if (!user.googleId) user.googleId = googleId;
+      user.authProvider = "google";
+      if (avatar && !user.avatar) user.avatar = avatar;
+      await user.save();
     }
 
     const token = generateToken(user._id);
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-
-    console.log("Google Auth Success for user:", user.email);
-
-    // Redirect to frontend with token in URL
     res.redirect(`${frontendUrl}?token=${token}`);
-  } catch (error) {
-    console.error("Manual Google Callback Error:", error.message);
-    if (error.response?.data) {
-      console.error("Google API Response Error:", error.response.data);
-    }
-    res.redirect(`${process.env.FRONTEND_URL}/login?error=auth_failed`);
+  } catch (err) {
+    console.error("Google callback error:", err.message);
+    res.redirect(`${frontendUrl}/login?error=auth_failed`);
   }
-});
+};
 
 export const getMe = (req, res) => {
   res.status(200).json({
@@ -279,4 +255,3 @@ export const logout = asyncHandler(async (req, res) => {
     message: "Logged out successfully",
   });
 });
-
