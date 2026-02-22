@@ -12,14 +12,17 @@
     html,
     body {
         height: 100dvh;
-        width: 100vw;
+        width: 100%;
         overflow: hidden;
         position: fixed;
+        left: 0;
+        top: 0;
     }
 
     #root {
         height: 100%;
         width: 100%;
         overflow: hidden;
+        position: relative;
     }
 }

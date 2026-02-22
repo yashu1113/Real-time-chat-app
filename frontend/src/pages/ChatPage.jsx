@@ -1,4 +1,3 @@
-import { IoArrowBack } from "react-icons/io5";
 import { Navigate } from 'react-router-dom';
 import { Sidebar } from '../features/conversations';
 import { MessageContainer } from '../features/messages';
@@ -8,7 +7,7 @@ import '../styles/chat-theme.css';
 
 const ChatPage = () => {
     const { authUser } = useAuthContext();
-    const { selectedConversation, setSelectedConversation } = useConversation();
+    const { selectedConversation } = useConversation();
 
     // Redirect to login if not authenticated
     if (!authUser) {
@@ -16,18 +15,14 @@ const ChatPage = () => {
     }
 
     return (
-        <div className="flex h-[100dvh] overflow-hidden" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
-            <div className={`h-full ${selectedConversation ? 'mobile-hidden' : 'w-full'} flex-shrink-0`} style={{ width: selectedConversation ? '0' : 'auto' }}>
+        <div className="flex h-[100dvh] w-full overflow-hidden" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
+            {/* Sidebar Container */}
+            <div className={`h-full flex-shrink-0 ${selectedConversation ? 'hidden sm:flex' : 'w-full sm:w-auto'}`}>
                 <Sidebar />
             </div>
 
-            <div className={`flex-1 h-full flex flex-col ${!selectedConversation ? 'mobile-hidden' : 'messages-container-wrapper'}`}>
-                {/* Mobile Header Override / Back Button area could be here or inside MessageContainer */}
-                {/* Actually, it's cleaner to put the back button inside the ChatHeader or a wrapper here. 
-                    Let's put a subtle back button overlay or rely on the ChatHeader modification.
-                    Wait, the design says "Add 'Back' button to ChatHeader.jsx".
-                    Let's follow that. For now, pass the handler down or just use the store in ChatHeader.
-                */}
+            {/* Chat Container */}
+            <div className={`flex-1 h-full flex flex-col ${!selectedConversation ? 'hidden sm:flex' : 'w-full messages-container-wrapper relative'}`}>
                 <MessageContainer />
             </div>
         </div>
