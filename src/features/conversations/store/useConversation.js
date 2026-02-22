@@ -105,6 +105,34 @@ const useConversation = create((set) => ({
       return { conversations: updatedConversations };
     });
   },
+  deleteMessageFromStore: (messageId) => {
+    set((state) => {
+        // Update in messages list
+        const updatedMessages = state.messages.map((msg) =>
+            msg._id === messageId ? { ...msg, isDeleted: true, content: "This message was deleted" } : msg
+        );
+
+        // Update in conversations list (lastMessage)
+        const updatedConversations = state.conversations.map((c) => {
+            if (c.lastMessage?._id === messageId) {
+                return { ...c, lastMessage: { ...c.lastMessage, isDeleted: true, content: "This message was deleted" } };
+            }
+            return c;
+        });
+
+        // Update selectedConversation (lastMessage)
+        let updatedSelected = state.selectedConversation;
+        if (state.selectedConversation?.lastMessage?._id === messageId) {
+            updatedSelected = { ...state.selectedConversation, lastMessage: { ...state.selectedConversation.lastMessage, isDeleted: true, content: "This message was deleted" } };
+        }
+
+        return {
+            messages: updatedMessages,
+            conversations: updatedConversations,
+            selectedConversation: updatedSelected
+        };
+    });
+  },
 }));
 
 export default useConversation;

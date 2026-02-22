@@ -63,7 +63,7 @@
 
 /* Message Bubbles - Enhanced */
 .message-bubble {
-    max-width: 65%;
+    max-width: 75%;
     padding: 10px 14px;
     border-radius: 12px;
     position: relative;
@@ -499,7 +499,7 @@
 .messages-container {
     flex: 1;
     overflow-y: auto;
-    padding: 20px 60px;
+    padding: 20px 30px;
     display: flex;
     flex-direction: column;
     gap: 8px;
