@@ -36,7 +36,7 @@ const SignUp = () => {
     }, []);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50">
             <div className="grid lg:grid-cols-2 w-full mx-auto bg-white shadow-2xl overflow-hidden">
                 {/* Form Section - LEFT SIDE */}
                 <div className={`flex items-center justify-center p-6 lg:p-8 transform transition-all duration-700 ${fadeIn ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"}`}>

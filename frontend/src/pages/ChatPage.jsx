@@ -16,7 +16,7 @@ const ChatPage = () => {
     }
 
     return (
-        <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
+        <div className="flex h-[100dvh] overflow-hidden" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
             <div className={`h-full ${selectedConversation ? 'mobile-hidden' : ''}`} style={{ width: 'auto' }}>
                 <Sidebar />
             </div>

@@ -1,15 +1,14 @@
 import mongoose from "mongoose";
 import { generateCustomId } from "../../shared/utils/generate-custom-id.js";
 
-const userSchema = new mongoose.Schema(
-  {
+const userSchema = new mongoose.Schema({
     userId: {
       type: String,
       unique: true,
       index: true,
       immutable: true,
     },
-
+    
     name: {
       type: String,
       required: true,
@@ -22,7 +21,6 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
 
     password: {
@@ -39,7 +37,6 @@ const userSchema = new mongoose.Schema(
 
     googleId: {
       type: String,
-      sparse: true, // allows multiple null values (only one doc per googleId)
     },
 
     avatar: {
@@ -75,16 +72,15 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.index({ googleId: 1 }, { sparse: true });
+userSchema.index({ googleId: 1 });
 
-// Generate a custom user ID on first save
 userSchema.pre("save", async function (next) {
-  if (!this.userId) {
-    this.userId = await generateCustomId("US");
+  if (!this.customId) {
+    this.customId = await generateCustomId("US");
   }
   next();
 });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);  
 
-export default User;
+export default User;  

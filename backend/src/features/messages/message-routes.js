@@ -1,6 +1,6 @@
 import express from "express";
 import { authMiddleware } from "../auth/auth-middleware.js";
-import { sendMessage, getMessages } from "./message-controller.js";
+import { sendMessage, getMessages, deleteMessage, editMessage } from "./message-controller.js";
 
 const router = express.Router();
 
@@ -9,5 +9,11 @@ router.post("/", authMiddleware, sendMessage);
 
 // Get messages of a specific chat
 router.get("/:chatId", authMiddleware, getMessages);
+
+// Delete a message
+router.delete("/:messageId", authMiddleware, deleteMessage);
+
+// Edit a message
+router.patch("/:messageId", authMiddleware, editMessage);
 
 export default router;

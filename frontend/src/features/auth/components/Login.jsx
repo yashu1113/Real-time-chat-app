@@ -161,7 +161,7 @@ const Login = () => {
     }, []);
 
     return (
-        <div className={`min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-opacity duration-500 ${fadeIn ? "opacity-100" : "opacity-0"}`}>
+        <div className={`min-h-[100dvh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-opacity duration-500 ${fadeIn ? "opacity-100" : "opacity-0"}`}>
             <LoginForm onForgotPassword={() => { }} />
         </div>
     )

@@ -16,7 +16,7 @@ function App() {
 	}
 
 	return (
-		<div className='h-screen w-full'>
+		<div className='h-[100dvh] w-full'>
 			<Routes>
 				<Route path='/' element={authUser ? <ChatPage /> : <Navigate to={"/login"} />} />
 				<Route path='/login' element={authUser ? <Navigate to='/' /> : <Login />} />

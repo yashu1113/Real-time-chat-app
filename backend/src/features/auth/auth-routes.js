@@ -12,8 +12,17 @@ router.post("/google", googleLogin);
 router.get("/google", getGoogleAuthUrl);
 router.get("/google/callback", handleGoogleCallback);
 
+
 //protected routes
 router.get("/me", authMiddleware, getMe);
 router.post("/logout", authMiddleware, logout);
+
+
+
+
+
+
+
+
 
 export default router;

@@ -136,3 +136,99 @@ export const getMessages = asyncHandler(async (req, res) => {
     messages: messages.reverse(), // Send in chronological order (Old -> New)
   });
 });
+
+export const deleteMessage = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { messageId } = req.params;
+
+  const message = await Message.findById(messageId);
+
+  if (!message) {
+    return res.status(404).json({
+      success: false,
+      message: "Message not found",
+    });
+  }
+
+  if (message.sender.toString() !== userId.toString()) {
+    return res.status(403).json({
+      success: false,
+      message: "You are not authorized to delete this message",
+    });
+  }
+
+  if (message.isDeleted) {
+    return res.status(400).json({
+      success: false,
+      message: "Message is already deleted",
+    });
+  }
+
+  message.isDeleted = true;
+  message.content = "This message was deleted";
+  await message.save();
+
+  const io = req.app.get("socketio");
+  if (io) {
+    broadcastToRoom(io, message.chat.toString(), "deleteMessage", { messageId });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Message deleted successfully",
+  });
+});
+
+export const editMessage = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { messageId } = req.params;
+  const { content } = req.body;
+
+  if (!content) {
+    return res.status(400).json({
+      success: false,
+      message: "Content is required to edit message",
+    });
+  }
+
+  const message = await Message.findById(messageId);
+
+  if (!message) {
+    return res.status(404).json({
+      success: false,
+      message: "Message not found",
+    });
+  }
+
+  if (message.sender.toString() !== userId.toString()) {
+    return res.status(403).json({
+      success: false,
+      message: "You are not authorized to edit this message",
+    });
+  }
+
+  if (message.isDeleted) {
+    return res.status(400).json({
+      success: false,
+      message: "Cannot edit a deleted message",
+    });
+  }
+
+  message.content = content.trim();
+  message.isEdited = true;
+  message.editedAt = Date.now();
+  await message.save();
+
+  await message.populate("sender", "name email avatar");
+
+  const io = req.app.get("socketio");
+  if (io) {
+    broadcastToRoom(io, message.chat.toString(), "editMessage", { message });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Message edited successfully",
+    data: message,
+  });
+});
