@@ -87,7 +87,7 @@ const Sidebar = () => {
                 </div>
             )}
 
-            <div className="overflow-y-auto flex-1 custom-scrollbar">
+            <div className="overflow-y-auto flex-1 custom-scrollbar" style={{ minHeight: 0 }}>
                 {isLoading ? (
                     <div className="flex items-center justify-center p-8">
                         <span className="loading loading-spinner loading-lg" style={{ color: 'var(--chat-accent-primary)' }}></span>

@@ -46,7 +46,7 @@ const MessageContainer = () => {
 
     if (!selectedConversation) {
         return (
-            <div className="flex flex-col h-screen items-center justify-center" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
+            <div className="flex flex-col h-[100dvh] items-center justify-center" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
                 <div className="welcome-container">
                     <IoChatbubblesOutline className="welcome-icon mb-6" />
                     <h2 className="welcome-title">
@@ -64,13 +64,13 @@ const MessageContainer = () => {
     const isOnline = onlineUsers?.includes(otherParticipant._id);
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full overflow-hidden">
             <ChatHeader otherParticipant={otherParticipant} isOnline={isOnline} />
 
-            {/* Messages Area with Background Pattern */}
-            <div className="flex-1 relative overflow-hidden" style={{ backgroundColor: 'var(--chat-bg-main)' }}>
+            {/* Messages Area */}
+            <div className="flex-1 relative overflow-hidden flex flex-col">
                 <div
-                    className="absolute inset-0 opacity-[0.06]"
+                    className="absolute inset-0 opacity-[0.06] pointer-events-none"
                     style={{
                         backgroundImage: `url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='pattern' x='0' y='0' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cg fill='%23667781'%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Cpath d='M20,5 L25,10 L20,15 Z'/%3E%3Crect x='5' y='25' width='8' height='8' rx='1'/%3E%3Ccircle cx='30' cy='30' r='3'/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width='400' height='400' fill='url(%23pattern)'/%3E%3C/svg%3E")`,
                         backgroundRepeat: 'repeat',

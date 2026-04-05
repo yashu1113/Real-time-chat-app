@@ -36,21 +36,21 @@ const SignUp = () => {
     }, []);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="grid lg:grid-cols-2 w-full mx-auto bg-white shadow-2xl overflow-hidden">
+        <div className="min-h-[100dvh] flex items-center justify-center bg-[#111827] px-4 sm:px-6 lg:px-10 py-12">
+            <div className="grid lg:grid-cols-2 gap-10 items-center w-full max-w-7xl mx-auto overflow-hidden">
                 {/* Form Section - LEFT SIDE */}
-                <div className={`flex items-center justify-center p-6 lg:p-8 transform transition-all duration-700 ${fadeIn ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"}`}>
-                    <div className="w-full max-w-md">
+                <div className={`flex items-center justify-center p-6 lg:p-10 transform transition-all duration-700 ${fadeIn ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"}`}>
+                    <div className="w-full max-w-lg">
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-1 text-center">
-                                <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
-                                <p className="text-gray-500 text-sm">Join us and start chatting</p>
+                                <h1 className="text-3xl font-bold text-white">Create Account</h1>
+                                <p className="text-gray-400 text-sm">Join us and start chatting</p>
                             </div>
 
                             {/* Google Sign Up Button */}
                             <a
                                 href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/google`}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-slate-700 rounded-md shadow-sm bg-slate-900 text-sm font-medium text-gray-100 hover:bg-slate-800 transition-all"
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -63,16 +63,16 @@ const SignUp = () => {
 
                             <div className="relative">
                                 <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-gray-200"></div>
+                                    <div className="w-full border-t border-gray-700"></div>
                                 </div>
                                 <div className="relative flex justify-center text-sm">
-                                    <span className="bg-white px-4 text-gray-500 font-medium">Or continue with</span>
+                                    <span className="bg-[#111827] px-4 text-gray-400 font-medium">Or continue with</span>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
                                 <div>
-                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                    <label htmlFor="name" className="block text-sm font-medium text-gray-200 mb-1">Full Name</label>
                                     <input
                                         id="name"
                                         type="text"
@@ -81,11 +81,11 @@ const SignUp = () => {
                                         disabled={loading}
                                         value={inputs.name}
                                         onChange={e => setInputs({ ...inputs, name: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        className="w-full px-3 py-2 border border-slate-700 rounded-md bg-slate-900 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-1">Email</label>
                                     <input
                                         id="email"
                                         type="email"
@@ -94,11 +94,11 @@ const SignUp = () => {
                                         disabled={loading}
                                         value={inputs.email}
                                         onChange={e => setInputs({ ...inputs, email: e.target.value })}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        className="w-full px-4 py-3 border border-slate-700 rounded-lg bg-slate-900 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                    <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-1">Password</label>
                                     <div className="relative">
                                         <input
                                             id="password"
@@ -108,12 +108,12 @@ const SignUp = () => {
                                             disabled={loading}
                                             value={inputs.password}
                                             onChange={e => setInputs({ ...inputs, password: e.target.value })}
-                                            className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                            className="w-full px-4 py-3 pr-12 border border-slate-700 rounded-lg bg-slate-900 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
                                         >
                                             {showPassword ? (
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -129,7 +129,7 @@ const SignUp = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-200 mb-1">Confirm Password</label>
                                     <div className="relative">
                                         <input
                                             id="confirmPassword"
@@ -139,12 +139,12 @@ const SignUp = () => {
                                             disabled={loading}
                                             value={inputs.confirmPassword}
                                             onChange={e => setInputs({ ...inputs, confirmPassword: e.target.value })}
-                                            className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                            className="w-full px-4 py-3 pr-12 border border-slate-700 rounded-lg bg-slate-900 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
                                         >
                                             {showConfirmPassword ? (
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -175,7 +175,7 @@ const SignUp = () => {
                             </button>
 
                             <div className="text-center">
-                                <Link to="/login" className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors">
+                                <Link to="/login" className="text-sm text-blue-400 hover:text-blue-300 font-medium hover:underline transition-colors">
                                     Already have an account? <span className="font-semibold">Log in</span>
                                 </Link>
                             </div>
@@ -185,11 +185,11 @@ const SignUp = () => {
 
                 {/* Illustration Section - RIGHT SIDE */}
                 <div className={`hidden lg:flex flex-col items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 py-16 px-12 transform transition-all duration-700 delay-200 ${fadeIn ? "translate-x-0 opacity-100" : "translate-x-10 opacity-0"}`}>
-                    <div className="text-center space-y-6 w-full max-w-md">
+                    <div className="text-center space-y-6 w-full max-w-lg">
                         <img
                             src="https://illustrations.popsy.co/white/communication.svg"
                             alt="Signup illustration"
-                            className="w-full max-w-[300px] mx-auto drop-shadow-2xl animate-bounce-slow"
+                            className="w-full max-w-[360px] mx-auto drop-shadow-2xl animate-bounce-slow"
                         />
                         <div className="text-white space-y-2">
                             <h2 className="text-2xl font-bold">Welcome to ChatApp!</h2>

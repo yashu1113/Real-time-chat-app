@@ -80,7 +80,7 @@ const MessageList = ({ messages, loading, authUser, hasMore, loadMore }) => {
     }, [hasMore, loadMore, loading]);
 
     return (
-        <div ref={containerRef} className="messages-container relative z-10 flex flex-col h-full overflow-y-auto">
+        <div ref={containerRef} className="messages-container relative z-10 flex flex-col overflow-y-auto">
             {/* Sentinel for loading history */}
             {hasMore && (
                 <div ref={topLoaderRef} className="flex justify-center p-4">

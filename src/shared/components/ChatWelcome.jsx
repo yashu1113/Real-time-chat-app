@@ -25,7 +25,7 @@ const ChatWelcome = () => {
     }, []);
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 overflow-hidden">
+        <div className="min-h-[100dvh] w-full flex items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 overflow-hidden">
             {/* Animated Background Circles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -76,8 +76,8 @@ const ChatWelcome = () => {
                             <div
                                 key={index}
                                 className={`h-1 rounded-full transition-all duration-500 ${index <= currentStep
-                                        ? 'w-8 bg-gradient-to-r from-blue-500 to-purple-500'
-                                        : 'w-1 bg-gray-700'
+                                    ? 'w-8 bg-gradient-to-r from-blue-500 to-purple-500'
+                                    : 'w-1 bg-gray-700'
                                     }`}
                             />
                         ))}
