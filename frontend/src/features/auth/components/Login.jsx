@@ -29,17 +29,17 @@ export function LoginForm({ onForgotPassword }) {
     }
 
     return (
-        <div className="grid lg:grid-cols-2 gap-8 items-center max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-10 items-center w-full max-w-7xl mx-auto">
             <div className="hidden lg:block">
                 <img
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/login-page-pZBjg7Vta1coXXQMIFvKhdubuWT77D.png"
                     alt="Login illustration"
                     width={500}
                     height={500}
-                    className="w-full max-w-[400px] mx-auto"
+                    className="w-full max-w-[480px] mx-auto"
                 />
             </div>
-            <div className="w-full max-w-md mx-auto">
+            <div className="w-full max-w-lg mx-auto">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2 text-center">
                         <h1 className="text-3xl font-bold">Welcome back</h1>
@@ -161,7 +161,7 @@ const Login = () => {
     }, []);
 
     return (
-        <div className={`min-h-[100dvh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-opacity duration-500 ${fadeIn ? "opacity-100" : "opacity-0"}`}>
+        <div className={`min-h-[100dvh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-10 transition-opacity duration-500 ${fadeIn ? "opacity-100" : "opacity-0"}`}>
             <LoginForm onForgotPassword={() => { }} />
         </div>
     )
